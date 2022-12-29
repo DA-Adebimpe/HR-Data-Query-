@@ -1,0 +1,175 @@
+----Display details of jobs where the minimum salary is greater than 10000.
+-- >
+select * from jobs 
+ where min_salary > 10000;
+
+ --Display the first name and join date of the employees who joined between 2002 and 2005.
+ --as, year, between, and
+ select first_name, hire_date as join_date  from employees
+    where year(hire_date) between 2002 and 2005;
+
+ select first_name, hire_date join_date from employees
+    where hire_date between '2002-01-01' and '2005-12-31';
+
+----Display first name and join date of the employees who is either IT Programmer or Sales Man.
+--in , or
+ select first_name, hire_date as join_date  from employees
+   where job_id in ('IT_PROG', 'SA_MAN');
+
+ select FIRST_NAME, hire_date as join_date  from EMPLOYEES
+   where job_id  = 'IT_PROG' or job_id = 'SA_MAN';
+
+ --Display employees who joined after 1st January 2008.
+ -- >
+ Select * from EMPLOYEES
+where hire_date > '2008-01-01'
+
+ -- display the details of employees with ID 150 OR 160.
+ -- in
+ SELECT * 
+FROM employees
+WHERE employee_id IN (150, 160);
+ -- display first name, last name, salary, commission pct, and hire date for employees with salary less than 10000
+ --<
+ SELECT first_name, last_name, salary, commission_pct, hire_date 
+FROM employees
+WHERE salary < 10000;
+
+ SELECT first_name, last_name, CONCAT(first_name,' ', last_name) fullname,
+ salary, commission_pct, hire_date 
+FROM employees
+WHERE salary < 10000;
+
+-- display job title, the difference between the minimum and maximum salaries for jobs with max salary in the range 10000 to 20000
+-- minus (-), between, and, as
+select job_title,  max_salary - MIN_SALARY as salary_difference from jobs
+  where max_salary between 10000 and 20000;
+
+--Display first name, salary, and round the salary to thousands.
+--round, as
+select first_name, salary, 
+case when first_name in ( 'Ismael','Nancy') then salary
+when salary < 5000 then salary
+  else round(salary,-3) end as rounded_salary from EMPLOYEES; 
+
+select first_name, salary,round(salary,-3)  as rounded_salary from EMPLOYEES; 
+
+----Display details of jobs in the descending order of the title.
+--order by, desc/asc
+select * from jobs order by job_title desc
+
+--Display employees where the first name or last name starts with S
+--like
+select * from EMPLOYEES
+ where first_name like 'S%' or last_name like 'S%'
+
+ select * from EMPLOYEES
+ where first_name like '%S%'
+
+ --Display employees who joined in the month of May.
+ --month
+ select* from EMPLOYEES where MONTH(hire_date) = 5;
+
+ --Display details of the employees where commission percentage is null 
+   --and salary in the range 5000 to 10000 and department is 50.
+   --is null, coalesce
+select first_name, 
+commission_pct, 
+coalesce(commission_pct,1),
+case when commission_pct is null then 50 else commission_pct end from EMPLOYEES
+  where commission_pct is null
+    and salary between 5000 and 10000
+	and DEPARTMENT_ID = 50;
+
+	between 1 and 5.... 1,2,3,4,5
+	> 1 and < 5 ....2,3,4
+	>= 1 and <= 5...1,2,3,4,5
+	>1 and <= 5...
+
+	/* examples of aggregate funtion
+- count
+- sum
+-min
+- max
+- average
+*/
+
+SELECT job_id,
+	year(hire_date) as year_date, 
+	sum(salary) as total_salary,
+	count(employee_id) as total_emp,
+	floor(avg(salary)) as average_salary
+ FROM EMPLOYEES 
+   group by job_id,year(hire_date)
+ order by 3 desc;
+
+-- Display department_id, maximum salary, total employees per year of hire for all employees
+ select DEPARTMENT_ID as Department, 
+	MAX(SALARY) as Maximum_Salary, 
+	Count(EMPLOYEE_ID) as Total_Employees, 
+	YEAR(Hire_Date) as Year_Hired
+from EMPLOYEES
+	GROUP BY DEPARTMENT_ID, YEAR(Hire_Date)
+ORDER BY DEPARTMENT_ID ASC
+
+--display jobs and total commission per department for employees with commision_pct
+select JOB_ID as Jobs, SUM(COMMISSION_PCT) as Total_Commission, DEPARTMENT_ID as Department
+from EMPLOYEES
+where COMMISSION_PCT IS NOT NULL
+GROUP BY JOB_ID, DEPARTMENT_ID
+
+
+
+--DISPLAY THE DEPARTMENT ID, DEPARTMENT NAME, MANAGER ID AND HIS/HER NAME 
+  --FOR DEPARTMENTS WITH MANAGERS
+
+select * from departments 
+select * from employees
+
+select departments.department_id, 
+departments.department_name, 
+departments.manager_id, 
+employees.first_name
+from departments  inner join employees 
+on departments.manager_id = employees.employee_id;
+
+select d.department_id,
+d.department_name,
+d.manager_id,
+e.first_name
+from DEPARTMENTS  as d 
+inner join employees as e
+on d.manager_id = e.EMPLOYEE_ID;
+
+--DISPLAY THE DEPARTMENT ID, DEPARTMENT NAME, MANAGER ID AND HIS/HER NAME 
+  --FOR DEPARTMENTS WITH  or without MANAGERS
+  select d.department_id,
+d.department_name,
+d.manager_id,
+e.first_name
+from DEPARTMENTS  as d 
+left join employees as e
+on d.manager_id = e.EMPLOYEE_ID;
+
+ --DISPLAY THE DEPARTMENT ID, DEPARTMENT NAME, MANAGER ID AND HIS/HER NAME 
+  --FOR DEPARTMENTS WITH managers and show other employees that are yet to be a dept manager
+    select d.department_id,
+d.department_name,
+d.manager_id,
+e.first_name
+from DEPARTMENTS  as d 
+right join employees as e
+on d.manager_id = e.EMPLOYEE_ID
+order by 1 desc;
+
+ --DISPLAY THE DEPARTMENT ID, DEPARTMENT NAME, MANAGER ID AND HIS/HER NAME 
+  --FOR DEPARTMENTS WITH managers or without managers 
+  --and show other employees that are yet to be a dept manager
+    select d.department_id,
+d.department_name,
+d.manager_id,
+e.first_name
+from DEPARTMENTS  as d 
+full outer join employees as e
+on d.manager_id = e.EMPLOYEE_ID
+order by 1 desc;
